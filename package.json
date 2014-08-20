@@ -1,0 +1,26 @@
+{
+  "name": "mongodown",
+  "version": "0.0.0",
+  "description": "A MongoDB implementation of the LevelDOWN API",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "author": "Thomas Watson Steen <w@tson.dk>",
+  "license": "MIT",
+  "dependencies": {
+    "abstract-leveldown": "^0.12.4",
+    "mongojs": "^0.13.1"
+  },
+  "devDependencies": {
+    "tap": "^0.4.12"
+  },
+  "keywords": [
+    "mongo",
+    "mongodb",
+    "level",
+    "leveldown",
+    "levelup",
+    "leveldb"
+  ]
+}
