@@ -23,5 +23,13 @@
     "leveldown",
     "levelup",
     "leveldb"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/watson/mongodown.git"
+  },
+  "bugs": {
+    "url": "https://github.com/watson/mongodown/issues"
+  },
+  "homepage": "https://github.com/watson/mongodown"
 }
