@@ -44,3 +44,5 @@ require('abstract-leveldown/abstract/close-test').close(factory, test, testCommo
 require('abstract-leveldown/abstract/iterator-test').setUp(factory, test, testCommon)
 require('abstract-leveldown/abstract/iterator-test').args(test)
 require('abstract-leveldown/abstract/iterator-test').sequence(test)
+require('abstract-leveldown/abstract/iterator-test').iterator(factory, test, testCommon, testCommon.collectEntries)
+require('abstract-leveldown/abstract/iterator-test').tearDown(test, testCommon)

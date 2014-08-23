@@ -24,6 +24,10 @@ db.readStream()
   .on('close', function () { console.log('Show\'s over folks!') })
 ```
 
+## Limitations
+
+MongoDOWN does not support iterator snapshots
+
 ## License
 
 MIT
