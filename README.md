@@ -8,6 +8,12 @@ LevelDB store.
 
 [![Build Status](https://travis-ci.org/watson/mongodown.png)](https://travis-ci.org/watson/mongodown)
 
+## Installation
+
+```
+npm install mongodown
+```
+
 ## Example
 
 ```javascript
