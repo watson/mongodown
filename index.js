@@ -87,6 +87,7 @@ MongoDOWN.prototype._iterator = function (options) {
 
 var MongoIterator = function (db, options) {
   AbstractIterator.call(this, db);
+  if (options.limit === 0) return;
   this._options = options;
   var query = { _id: {} };
   if (options.reverse) {
@@ -113,6 +114,7 @@ util.inherits(MongoIterator, AbstractIterator);
 
 MongoIterator.prototype._next = function (callback) {
   var options = this._options;
+  if (!this._cursor) return callback();
   this._cursor.next(function (err, doc) {
     if (err) return callback(err);
     if (!doc) return callback();
@@ -127,6 +129,6 @@ MongoIterator.prototype._next = function (callback) {
 };
 
 MongoIterator.prototype._end = function (callback) {
-  this._cursor.destroy();
+  if (this._cursor) this._cursor.destroy();
   callback();
 };
