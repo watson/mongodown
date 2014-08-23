@@ -1,6 +1,6 @@
 {
   "name": "mongodown",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A MongoDB implementation of the LevelDOWN API",
   "main": "index.js",
   "scripts": {
