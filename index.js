@@ -4,25 +4,25 @@ var util              = require('util');
 var mongojs           = require('mongojs');
 var AbstractLevelDOWN = require('abstract-leveldown').AbstractLevelDOWN;
 
-var MongoDown = module.exports = function (mongoUri) {
-  if (!(this instanceof MongoDown))
-    return new MongoDown(mongoUri);
+var MongoDOWN = module.exports = function (mongoUri) {
+  if (!(this instanceof MongoDOWN))
+    return new MongoDOWN(mongoUri);
   AbstractLevelDOWN.call(this, mongoUri);
 };
 
-util.inherits(MongoDown, AbstractLevelDOWN);
+util.inherits(MongoDOWN, AbstractLevelDOWN);
 
-MongoDown.prototype._open = function (options, callback) {
+MongoDOWN.prototype._open = function (options, callback) {
   this._db = mongojs(this.location, ['mongodown']);
   process.nextTick(callback.bind(null, null, this));
 };
 
-MongoDown.prototype._close = function (callback) {
+MongoDOWN.prototype._close = function (callback) {
   this._db.close();
   process.nextTick(callback);
 };
 
-MongoDown.prototype._get = function (key, options, callback) {
+MongoDOWN.prototype._get = function (key, options, callback) {
   this._db.mongodown.findOne({ _id: key }, function (err, doc) {
     if (err) return callback(err);
     if (!doc) return callback(new Error('notFound'));
@@ -30,15 +30,15 @@ MongoDown.prototype._get = function (key, options, callback) {
   });
 };
 
-MongoDown.prototype._put = function (key, value, options, callback) {
+MongoDOWN.prototype._put = function (key, value, options, callback) {
   this._db.mongodown.update({ _id: key, value: value }, { upsert: true }, callback);
 };
 
-MongoDown.prototype._del = function (key, options, callback) {
+MongoDOWN.prototype._del = function (key, options, callback) {
   this._db.mongodown.remove({ _id: key }, callback);
 };
 
-MongoDown.prototype._batch = function (array, options, callback) {
+MongoDOWN.prototype._batch = function (array, options, callback) {
   var self = this,
       batches = [[]],
       batchIndex = 0,

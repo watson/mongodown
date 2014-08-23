@@ -1,4 +1,4 @@
-# MongoDown
+# MongoDOWN
 
 A drop-in replacement for
 [LevelDOWN](https://github.com/rvagg/node-leveldown) that runs on

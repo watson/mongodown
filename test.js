@@ -2,10 +2,10 @@
 
 var test = require('tap').test;
 var testCommon = require('./testCommon');
-var MongoDown = require('./');
+var MongoDOWN = require('./');
 
 function factory (location) {
-  return new MongoDown(location);
+  return new MongoDOWN(location);
 }
 
 /*** compatibility with basic LevelDOWN API ***/
