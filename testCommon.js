@@ -1,22 +1,41 @@
 'use strict';
 
 var mongojs = require('mongojs');
+var afterAll = require('after-all');
 
 var dbidx = 0
 
   , location = function () {
-      return 'localhost/mongodown_test_' + dbidx++
+      return 'mongodown_test_' + dbidx++
     }
 
   , lastLocation = function () {
-      return 'localhost/mongodown_test_' + dbidx
+      return 'mongodown_test_' + dbidx
     }
 
   , cleanup = function (callback) {
-      var db = mongojs(lastLocation())
-      db.dropDatabase(function (err) {
-        if (!err) db.close()
+      var finished = function (err) {
+        admin.close()
+        if (err) throw err
         callback(err)
+      }
+      var admin = mongojs('admin')
+      admin.runCommand('listDatabases', function (err, result) {
+        if (err) return finished(err)
+        var next = afterAll(finished)
+        result.databases
+          .filter(function (database) {
+            return /^mongodown_test_\d+$/.test(database.name)
+          })
+          .forEach(function (database) {
+            var db = mongojs(database.name)
+            var done = next()
+            db.dropDatabase(function (err) {
+              db.close()
+              if (err) throw err
+              done(err)
+            })
+          })
       });
     }
 
