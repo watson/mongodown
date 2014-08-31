@@ -9,7 +9,7 @@
   "author": "Thomas Watson Steen <w@tson.dk>",
   "license": "MIT",
   "dependencies": {
-    "abstract-leveldown": "git://github.com/rvagg/abstract-leveldown.git#f207e052d",
+    "abstract-leveldown": "git://github.com/watson/abstract-leveldown.git#a0b36f6a",
     "mongojs": "^0.13.1"
   },
   "devDependencies": {
