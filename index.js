@@ -27,7 +27,10 @@ MongoDOWN.prototype._get = function (key, options, callback) {
   this._db.mongodown.findOne({ _id: key }, function (err, doc) {
     if (err) return callback(err);
     if (!doc) return callback(new Error('notFound'));
-    callback(null, doc.value);
+    var value = options.asBuffer ?
+      (Buffer.isBuffer(doc.value) ? doc.value : new Buffer(doc.value)) :
+      (Buffer.isBuffer(doc.value) ? doc.value.toString() : doc.value);
+    callback(null, value);
   });
 };
 
