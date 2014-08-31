@@ -5,6 +5,17 @@ var mongojs           = require('mongojs');
 var AbstractLevelDOWN = require('abstract-leveldown').AbstractLevelDOWN;
 var AbstractIterator  = require('abstract-leveldown').AbstractIterator;
 
+var dbExists = function (name, callback) {
+  var admin = mongojs('admin');
+  admin.runCommand('listDatabases', function (err, result) {
+    if (err) return callback(err);
+    for (var n = 0, l = result.databases.length; n < l; n++)
+      if (result.databases[n].name === name) return callback(null, true);
+    callback();
+    admin.close();
+  });
+};
+
 var MongoDOWN = module.exports = function (mongoUri) {
   if (!(this instanceof MongoDOWN))
     return new MongoDOWN(mongoUri);
@@ -14,8 +25,27 @@ var MongoDOWN = module.exports = function (mongoUri) {
 util.inherits(MongoDOWN, AbstractLevelDOWN);
 
 MongoDOWN.prototype._open = function (options, callback) {
-  this._db = mongojs(this.location, ['mongodown']);
-  process.nextTick(callback.bind(null, null, this));
+  var self = this;
+
+  var connect = function () {
+    self._db = mongojs(self.location, ['mongodown']);
+    callback(null, self);
+  };
+
+  if (!options.createIfMissing)
+    dbExists(self.location, function (err, exists) {
+      if (err) return callback(err);
+      if (!exists) return callback(new Error('Database ' + self.location + ' doesn\'t exist'));
+      connect();
+    });
+  else if (options.errorIfExists)
+    dbExists(self.location, function (err, exists) {
+      if (err) return callback(err);
+      if (exists) return callback(new Error('Database ' + self.location + ' already exists'));
+      connect();
+    });
+  else
+    process.nextTick(connect);
 };
 
 MongoDOWN.prototype._close = function (callback) {
