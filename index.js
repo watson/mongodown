@@ -4,6 +4,7 @@ var util              = require('util');
 var mongojs           = require('mongojs');
 var AbstractLevelDOWN = require('abstract-leveldown').AbstractLevelDOWN;
 var AbstractIterator  = require('abstract-leveldown').AbstractIterator;
+var afterAll          = require('after-all');
 
 var dbExists = function (name, callback) {
   var admin = mongojs('admin');
@@ -97,8 +98,9 @@ MongoDOWN.prototype._batch = function (array, options, callback) {
     if (!batch) return callback();
     switch (batch[0].type) {
       case 'put':
-        var docs = batch.map(function (e) { return { _id: e.key, value: e.value }; });
-        self._db.mongodown.insert(docs, { upsert: true }, commit);
+        var next = afterAll(commit);
+        for (var n = 0, l = batch.length; n < l; n++)
+          self._db.mongodown.save({ _id: batch[n].key, value: batch[n].value }, next());
         break;
       case 'del':
         var keys = batch.map(function (e) { return e.key; });

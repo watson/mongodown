@@ -10,10 +10,10 @@
   "license": "MIT",
   "dependencies": {
     "abstract-leveldown": "git://github.com/watson/abstract-leveldown.git#a0b36f6a",
+    "after-all": "^2.0.0",
     "mongojs": "^0.13.1"
   },
   "devDependencies": {
-    "after-all": "^2.0.0",
     "tap": "^0.4.12"
   },
   "keywords": [
