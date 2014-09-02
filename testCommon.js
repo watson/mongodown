@@ -16,7 +16,6 @@ var dbidx = 0
   , cleanup = function (callback) {
       var finished = function (err) {
         admin.close()
-        if (err) throw err
         callback(err)
       }
       var admin = mongojs('admin')
@@ -32,7 +31,6 @@ var dbidx = 0
             var done = next()
             db.dropDatabase(function (err) {
               db.close()
-              if (err) throw err
               done(err)
             })
           })
