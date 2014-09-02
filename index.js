@@ -73,6 +73,7 @@ MongoDOWN.prototype._del = function (key, options, callback) {
   this._db.mongodown.remove({ _id: key }, callback);
 };
 
+// TODO: Consider using writeConcern's in MongoDB to simulate sync
 MongoDOWN.prototype._batch = function (array, options, callback) {
   var self = this,
       batches = [[]],
