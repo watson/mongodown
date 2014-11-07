@@ -36,7 +36,7 @@ MongoDOWN.prototype._open = function (options, callback) {
   if (!options.createIfMissing)
     dbExists(self.location, function (err, exists) {
       if (err) return callback(err);
-      if (!exists) return callback(new Error('Database ' + self.location + ' doesn\'t exist'));
+      if (!exists) return callback(new Error('Database ' + self.location + ' does not exist'));
       connect();
     });
   else if (options.errorIfExists)
