@@ -66,7 +66,7 @@ MongoDOWN.prototype._get = function (key, options, callback) {
 };
 
 MongoDOWN.prototype._put = function (key, value, options, callback) {
-  this._db.mongodown.update({ _id: key, value: value }, { upsert: true }, callback);
+  this._db.mongodown.update({ _id: key }, { value: value }, { upsert: true }, callback);
 };
 
 MongoDOWN.prototype._del = function (key, options, callback) {
