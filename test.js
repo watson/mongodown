@@ -12,16 +12,19 @@ function factory (location) {
 
 require('abstract-leveldown/abstract/leveldown-test').args(factory, test, testCommon)
 
+require('abstract-leveldown/abstract/open-test').setUp(factory, test, testCommon)
 require('abstract-leveldown/abstract/open-test').args(factory, test, testCommon)
+require('abstract-leveldown/abstract/open-test').open(factory, test, testCommon)
+// Test will not run because the database isn't actually created upon touch,
+// but rather when the first document is added
+// require('abstract-leveldown/abstract/open-test').openAdvanced(factory, test, testCommon)
+require('abstract-leveldown/abstract/open-test').tearDown(factory, test, testCommon)
 
-require('abstract-leveldown/abstract/del-test').setUp(factory, test, testCommon)
-require('abstract-leveldown/abstract/del-test').args(test)
+require('abstract-leveldown/abstract/del-test').all(factory, test, testCommon)
 
-require('abstract-leveldown/abstract/get-test').setUp(factory, test, testCommon)
-require('abstract-leveldown/abstract/get-test').args(test)
+require('abstract-leveldown/abstract/get-test').all(factory, test, testCommon)
 
-require('abstract-leveldown/abstract/put-test').setUp(factory, test, testCommon)
-require('abstract-leveldown/abstract/put-test').args(test)
+require('abstract-leveldown/abstract/put-test').all(factory, test, testCommon)
 
 require('abstract-leveldown/abstract/put-get-del-test').setUp(factory, test, testCommon)
 require('abstract-leveldown/abstract/put-get-del-test').errorKeys(test)
