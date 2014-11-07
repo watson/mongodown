@@ -9,12 +9,12 @@
   "author": "Thomas Watson Steen <w@tson.dk>",
   "license": "MIT",
   "dependencies": {
-    "abstract-leveldown": "^2.0.1",
+    "abstract-leveldown": "^2.0.3",
     "after-all": "^2.0.0",
-    "mongojs": "^0.13.1"
+    "mongojs": "^0.15.1"
   },
   "devDependencies": {
-    "tap": "^0.4.12"
+    "tap": "^0.4.13"
   },
   "keywords": [
     "mongo",
