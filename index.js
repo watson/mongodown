@@ -29,7 +29,8 @@ MongoDOWN.prototype._open = function (options, callback) {
   var self = this;
 
   var connect = function () {
-    self._db = mongojs(self.location, ['mongodown']);
+    self._conn = options.conn || mongojs(self.location);
+    self._db = self._conn.collection(options.collection || 'mongodown');
     callback(null, self);
   };
 
@@ -50,7 +51,7 @@ MongoDOWN.prototype._open = function (options, callback) {
 };
 
 MongoDOWN.prototype._close = function (callback) {
-  this._db.close();
+  this._conn.close();
   process.nextTick(callback);
 };
 
