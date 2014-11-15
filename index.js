@@ -27,10 +27,11 @@ util.inherits(MongoDOWN, AbstractLevelDOWN);
 
 MongoDOWN.prototype._open = function (options, callback) {
   var self = this;
+  this._opts = options;
 
   var connect = function () {
-    self._conn = options.conn || mongojs(self.location);
-    self._db = self._conn.collection(options.collection || 'mongodown');
+    self._conn = options.conn || mongojs(self.location, ['mongodown']);
+    self._db = mongojs(self._conn, [options.collection || 'mongodown']);
     callback(null, self);
   };
 
@@ -50,28 +51,37 @@ MongoDOWN.prototype._open = function (options, callback) {
     process.nextTick(connect);
 };
 
+MongoDOWN.prototype.collection = function ( ) {
+  if (this._opts && this._opts.collection) {
+    return this._db[this._opts.collection];
+  }
+  return this._conn.mongodown;
+};
+
 MongoDOWN.prototype._close = function (callback) {
   this._conn.close();
   process.nextTick(callback);
 };
 
 MongoDOWN.prototype._get = function (key, options, callback) {
-  this._db.mongodown.findOne({ _id: key }, function (err, doc) {
+  this.collection( ).findOne({ _id: key }, function (err, doc) {
     if (err) return callback(err);
     if (!doc) return callback(new Error('notFound'));
-    var value = options.asBuffer ?
-      (Buffer.isBuffer(doc.value) ? doc.value : new Buffer(doc.value)) :
-      (Buffer.isBuffer(doc.value) ? doc.value.toString() : doc.value);
+    var value = options.asBuffer
+      ? (Buffer.isBuffer(doc.value) ? doc.value : new Buffer(doc.value))
+      : (doc.value ? ( Buffer.isBuffer(doc.value)
+                   ? doc.value.toString() : doc.value)
+                 : doc.toString( ));
     callback(null, value);
   });
 };
 
 MongoDOWN.prototype._put = function (key, value, options, callback) {
-  this._db.mongodown.update({ _id: key }, { value: value }, { upsert: true }, callback);
+  this.collection( ).update({ _id: key }, { _id: key, value: value }, { upsert: true }, callback);
 };
 
 MongoDOWN.prototype._del = function (key, options, callback) {
-  this._db.mongodown.remove({ _id: key }, callback);
+  this.collection( ).remove({ _id: key }, callback);
 };
 
 // TODO: Consider using writeConcern's in MongoDB to simulate sync
@@ -102,11 +112,11 @@ MongoDOWN.prototype._batch = function (array, options, callback) {
       case 'put':
         var next = afterAll(commit);
         for (var n = 0, l = batch.length; n < l; n++)
-          self._db.mongodown.save({ _id: batch[n].key, value: batch[n].value }, next());
+          self.collection( ).save({ _id: batch[n].key, value: batch[n].value }, next());
         break;
       case 'del':
         var keys = batch.map(function (e) { return e.key; });
-        self._db.mongodown.remove({ _id: { $in: keys } }, commit);
+        self.collection( ).remove({ _id: { $in: keys } }, commit);
         break;
       default: // TODO: Does AbstractLevelDOWN take care of this for us?
         callback(new Error('Unknown batch type: ' + batch[0].type));
@@ -115,7 +125,7 @@ MongoDOWN.prototype._batch = function (array, options, callback) {
 };
 
 MongoDOWN.prototype._approximateSize = function (start, end, callback) {
-  this._db.mongodown.count({ _id: { $gte: start, $lte: end } }, callback);
+  this.collection( ).count({ _id: { $gte: start, $lte: end } }, callback);
 };
 
 MongoDOWN.prototype._iterator = function (options) {
@@ -143,7 +153,7 @@ var MongoIterator = function (db, options) {
     if (options.lte)   query._id.$lte = options.lte;
   }
   if (!Object.keys(query._id).length) delete query._id;
-  this._cursor = db._db.mongodown.find(query).sort({ _id: options.reverse ? -1 : 1 });
+  this._cursor = db.collection( ).find(query).sort({ _id: options.reverse ? -1 : 1 });
   if (options.limit && options.limit !== -1) this._cursor = this._cursor.limit(options.limit);
 };
 
@@ -154,7 +164,7 @@ MongoIterator.prototype._next = function (callback) {
   if (!this._cursor) return callback();
   this._cursor.next(function (err, doc) {
     if (err) return callback(err);
-    if (!doc) return callback();
+    if (!doc) return callback( );
     var key = options.keyAsBuffer ?
       (Buffer.isBuffer(doc._id) ? doc._id : new Buffer(doc._id)) :
       (Buffer.isBuffer(doc._id) ? doc._id.toString() : doc._id);
