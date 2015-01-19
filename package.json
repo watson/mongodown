@@ -11,7 +11,7 @@
   "dependencies": {
     "abstract-leveldown": "^2.1.0",
     "after-all": "^2.0.0",
-    "mongojs": "^0.15.1"
+    "mongojs": "^0.18.1"
   },
   "devDependencies": {
     "tap": "^0.4.13"
