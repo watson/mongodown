@@ -1,8 +1,12 @@
 language: node_js
 node_js:
-- '0.11'
-- '0.10'
-- '0.8'
+  - '0.11'
+  - '0.10'
+  - '0.8'
+services:
+  - mongodb
+before_install:
+  - npm install -g npm@~1.4.6
 deploy:
   provider: npm
   email: w@tson.dk
@@ -11,7 +15,3 @@ deploy:
   on:
     tags: true
     repo: watson/mongodown
-services:
-  - mongodb
-before_install:
-  - npm install -g npm@~1.4.6
