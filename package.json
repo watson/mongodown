@@ -22,7 +22,9 @@
     "level",
     "leveldown",
     "levelup",
-    "leveldb"
+    "leveldb",
+    "database",
+    "db"
   ],
   "repository": {
     "type": "git",
