@@ -31,12 +31,3 @@ before_install:
 
 before_script:
   - until nc -z localhost 27017; do echo Waiting for MongoDB; sleep 1; done
-
-deploy:
-  provider: npm
-  email: w@tson.dk
-  api_key:
-    secure: ctTf8S2qV+BwTIaBe+nasVIm4WMuC4gaBvtHnMPCxbFbeBhuZ2MfBXIxnkLiUTYP/M2E/J5MvOmN9Bkrt3Q2d9lfU28qxlHwrg5jar//bpA6pnFgPYM7HafgLSxqsxOfxy35psQGc3vEGZxnibTawMAP+dlZEG9jxx5kY38mUco=
-  on:
-    tags: true
-    repo: watson/mongodown
