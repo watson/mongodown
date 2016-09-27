@@ -1,6 +1,6 @@
 {
   "name": "mongodown",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "A MongoDB implementation of the LevelDOWN API",
   "main": "index.js",
   "scripts": {
@@ -33,5 +33,9 @@
   "bugs": {
     "url": "https://github.com/watson/mongodown/issues"
   },
-  "homepage": "https://github.com/watson/mongodown"
+  "homepage": "https://github.com/watson/mongodown",
+  "coordinates": [
+    40.7458692,
+    -73.9881377
+  ]
 }
