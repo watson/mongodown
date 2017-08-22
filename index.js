@@ -117,7 +117,7 @@ MongoDOWN.prototype._batch = function (array, options, callback) {
 };
 
 MongoDOWN.prototype._approximateSize = function (start, end, callback) {
-  this._db[self.collection].count({ _id: { $gte: start, $lte: end } }, callback);
+  this._db[this.collection].count({ _id: { $gte: start, $lte: end } }, callback);
 };
 
 MongoDOWN.prototype._iterator = function (options) {
@@ -145,7 +145,7 @@ var MongoIterator = function (db, options) {
     if (options.lte)   query._id.$lte = options.lte;
   }
   if (!Object.keys(query._id).length) delete query._id;
-  this._cursor = db._db[self.collection].find(query).sort({ _id: options.reverse ? -1 : 1 });
+  this._cursor = db._db[db.collection].find(query).sort({ _id: options.reverse ? -1 : 1 });
   if (options.limit && options.limit !== -1) this._cursor = this._cursor.limit(options.limit);
 };
 
