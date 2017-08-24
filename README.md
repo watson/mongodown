@@ -18,7 +18,12 @@ npm install mongodown
 
 ```javascript
 var levelup = require('levelup');
-var db = levelup('localhost/my-database', { db: require('mongodown') });
+
+// MondoDB Collection name defaults to 'mongodown'
+var db = levelup('localhost/my-database', { db: require('mongodown') }); 
+
+// OR pass custom MongoDB collection name
+db = levelup('localhost/my-database', { db: require('mongodown'), collection:'People_C' });
 
 db.put('name', 'Yuri Irsenovich Kim')
 db.put('dob', '16 February 1941')
