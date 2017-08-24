@@ -26,10 +26,13 @@ var MongoDOWN = module.exports = function (mongoUri) {
 util.inherits(MongoDOWN, AbstractLevelDOWN);
 
 MongoDOWN.prototype._open = function (options, callback) {
+   
   var self = this;
 
+  self.collection = options.collection || 'mongodown';
+  
   var connect = function () {
-    self._db = mongojs(self.location, ['mongodown']);
+    self._db = mongojs(self.location, [self.collection]);
     callback(null, self);
   };
 
@@ -55,7 +58,7 @@ MongoDOWN.prototype._close = function (callback) {
 };
 
 MongoDOWN.prototype._get = function (key, options, callback) {
-  this._db.mongodown.findOne({ _id: key }, function (err, doc) {
+  this._db[this.collection].findOne({ _id: key }, function (err, doc) {
     if (err) return callback(err);
     if (!doc) return callback(new Error('notFound'));
     var value = options.asBuffer ?
@@ -66,11 +69,11 @@ MongoDOWN.prototype._get = function (key, options, callback) {
 };
 
 MongoDOWN.prototype._put = function (key, value, options, callback) {
-  this._db.mongodown.update({ _id: key }, { _id: key, value: value }, { upsert: true }, callback);
+  this._db[this.collection].update({ _id: key }, { _id: key, value: value }, { upsert: true }, callback);
 };
 
 MongoDOWN.prototype._del = function (key, options, callback) {
-  this._db.mongodown.remove({ _id: key }, callback);
+  this._db[this.collection].remove({ _id: key }, callback);
 };
 
 // TODO: Consider using writeConcern's in MongoDB to simulate sync
@@ -101,11 +104,11 @@ MongoDOWN.prototype._batch = function (array, options, callback) {
       case 'put':
         var next = afterAll(commit);
         for (var n = 0, l = batch.length; n < l; n++)
-          self._db.mongodown.save({ _id: batch[n].key, value: batch[n].value }, next());
+          self._db[self.collection].save({ _id: batch[n].key, value: batch[n].value }, next());
         break;
       case 'del':
         var keys = batch.map(function (e) { return e.key; });
-        self._db.mongodown.remove({ _id: { $in: keys } }, commit);
+        self._db[self.collection].remove({ _id: { $in: keys } }, commit);
         break;
       default: // TODO: Does AbstractLevelDOWN take care of this for us?
         callback(new Error('Unknown batch type: ' + batch[0].type));
@@ -114,7 +117,7 @@ MongoDOWN.prototype._batch = function (array, options, callback) {
 };
 
 MongoDOWN.prototype._approximateSize = function (start, end, callback) {
-  this._db.mongodown.count({ _id: { $gte: start, $lte: end } }, callback);
+  this._db[this.collection].count({ _id: { $gte: start, $lte: end } }, callback);
 };
 
 MongoDOWN.prototype._iterator = function (options) {
@@ -142,7 +145,7 @@ var MongoIterator = function (db, options) {
     if (options.lte)   query._id.$lte = options.lte;
   }
   if (!Object.keys(query._id).length) delete query._id;
-  this._cursor = db._db.mongodown.find(query).sort({ _id: options.reverse ? -1 : 1 });
+  this._cursor = db._db[db.collection].find(query).sort({ _id: options.reverse ? -1 : 1 });
   if (options.limit && options.limit !== -1) this._cursor = this._cursor.limit(options.limit);
 };
 
