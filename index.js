@@ -29,8 +29,10 @@ MongoDOWN.prototype._open = function (options, callback) {
    
   var self = this;
 
-  self.collection = options.collection || 'mongodown';
-  
+  self.collection =
+	(options.collection === "users..bucket" ? "users__bucket" :
+	 (options.collection || 'mongodown'));
+
   var connect = function () {
     self._db = mongojs(self.location, [self.collection]);
     callback(null, self);
@@ -64,18 +66,22 @@ MongoDOWN.prototype._get = function (key, options, callback) {
     var value = options.asBuffer ?
       (Buffer.isBuffer(doc.value) ? doc.value : new Buffer(doc.value)) :
       (Buffer.isBuffer(doc.value) ? doc.value.toString() : doc.value);
+    var value = JSON.stringify(doc);
     callback(null, value);
   });
 };
 
 MongoDOWN.prototype._put = function (key, value, options, callback) {
-  this._db[this.collection].update({ _id: key }, { _id: key, value: value }, { upsert: true }, callback);
+  const data = JSON.parse(value);
+  this._db[this.collection].update({ _id: key }, data, { upsert: true }, callback);
 };
 
 MongoDOWN.prototype._del = function (key, options, callback) {
   this._db[this.collection].remove({ _id: key }, callback);
 };
 
+/* XXX temporarily disabling _batch since we need to find a way to 
+   explode the JSON.
 // TODO: Consider using writeConcern's in MongoDB to simulate sync
 MongoDOWN.prototype._batch = function (array, options, callback) {
   var self = this,
@@ -115,6 +121,7 @@ MongoDOWN.prototype._batch = function (array, options, callback) {
     }
   })();
 };
+*/
 
 MongoDOWN.prototype._approximateSize = function (start, end, callback) {
   this._db[this.collection].count({ _id: { $gte: start, $lte: end } }, callback);
@@ -152,17 +159,13 @@ var MongoIterator = function (db, options) {
 util.inherits(MongoIterator, AbstractIterator);
 
 MongoIterator.prototype._next = function (callback) {
-  var options = this._options;
+  //var options = this._options;
   if (!this._cursor) return callback();
   this._cursor.next(function (err, doc) {
     if (err) return callback(err);
     if (!doc) return callback();
-    var key = options.keyAsBuffer ?
-      (Buffer.isBuffer(doc._id) ? doc._id : new Buffer(doc._id)) :
-      (Buffer.isBuffer(doc._id) ? doc._id.toString() : doc._id);
-    var val = options.valueAsBuffer ?
-      (Buffer.isBuffer(doc.value) ? doc.value : new Buffer(doc.value)) :
-      (Buffer.isBuffer(doc.value) ? doc.value.toString() : doc.value);
+    var key = doc._id;
+    var val = JSON.stringify(doc);
     callback(undefined, key, val);
   });
 };
