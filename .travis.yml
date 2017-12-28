@@ -14,6 +14,8 @@ env:
   - MONGODB_VERSION="2.6*"
   - MONGODB_VERSION="3.0*"
   - MONGODB_VERSION="3.2*"
+  - MONGODB_VERSION="3.4*"
+  - MONGODB_VERSION="3.6*"
 
 before_install:
   # MongoDB
