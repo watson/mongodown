@@ -17,13 +17,14 @@ npm install mongodown
 ## Example
 
 ```javascript
-var levelup = require('levelup');
+var levelup = require('levelup')
+var mongodown = require('mongodown')
 
-// MondoDB Collection name defaults to 'mongodown'
-var db = levelup('localhost/my-database', { db: require('mongodown') }); 
+// MongoDB Collection name defaults to 'mongodown'
+var db = levelup(mongodown('localhost/my-database'))
 
 // OR pass custom MongoDB collection name
-db = levelup('localhost/my-database', { db: require('mongodown'), collection:'People_C' });
+db = levelup(mongodown('localhost/my-database'), { collection:'People_C' })
 
 db.put('name', 'Yuri Irsenovich Kim')
 db.put('dob', '16 February 1941')
