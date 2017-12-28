@@ -14,7 +14,8 @@
     "mongojs": "^2.4.0"
   },
   "devDependencies": {
-    "tap": "^0.5.0"
+    "tap": "^0.5.0",
+    "wait-on": "^2.0.2"
   },
   "keywords": [
     "mongo",
