@@ -25,6 +25,7 @@ before_install:
   - sudo apt-get update
   - sudo apt-get install -y --force-yes mongodb-org-server=`echo $MONGODB_VERSION`
   - mongod --version
+  - sudo service mongod start
 
 before_script:
   - echo Waiting for MongoDB...
