@@ -1,6 +1,11 @@
+dist: xenial
 language: node_js
 
 node_js:
+  - '14'
+  - '12'
+  - '10'
+  - '8'
   - '6'
   - '5'
   - '4'
@@ -11,23 +16,29 @@ node_js:
   - '0.10'
 
 env:
-  - MONGODB_VERSION="2.4*"
-  - MONGODB_VERSION="2.6*"
-  - MONGODB_VERSION="3.0*"
-  - MONGODB_VERSION="3.2*"
+  - MONGODB_VERSION=2.6
+  - MONGODB_VERSION=3.0
+  - MONGODB_VERSION=3.2
+  - MONGODB_VERSION=3.4
+  - MONGODB_VERSION=3.6
+  - MONGODB_VERSION=4.0
+  - MONGODB_VERSION=4.2
 
 before_install:
-  # MongoDB
-  - sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
-  - if [ "$MONGODB_VERSION" = "2.4*" ]; then echo "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen" | sudo tee /etc/apt/sources.list.d/mongodb.list; fi
-  - if [ "$MONGODB_VERSION" = "2.6*" ]; then echo "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen" | sudo tee /etc/apt/sources.list.d/mongodb.list; fi
-  - if [ "$MONGODB_VERSION" = "3.0*" ]; then echo "deb http://repo.mongodb.org/apt/ubuntu "$(lsb_release -sc)"/mongodb-org/testing multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.0.list; fi
-  - if [ "$MONGODB_VERSION" = "3.2*" ]; then echo "deb http://repo.mongodb.org/apt/ubuntu "$(lsb_release -sc)"/mongodb-org/testing multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list; fi
-  - sudo apt-get update
-  - if [ "$MONGODB_VERSION" = "2.4*" ]; then sudo apt-get install -y mongodb-10gen=`echo $MONGODB_VERSION`; fi
-  - if [ "$MONGODB_VERSION" != "2.4*" ]; then sudo apt-get install -y --force-yes mongodb-org-server=`echo $MONGODB_VERSION`; fi
-  - mongod --version
-  - if [ "$MONGODB_VERSION" = "2.4*" ]; then sudo service mongodb start; fi
+  # we have to install mongo-orchestration ourselves to get around permissions issues in subshells
+  - sudo pip install --upgrade 'git+git://github.com/mongodb/mongo-orchestration@master'
+  - sudo apt-get install -y libsnmp30
 
-before_script:
-  - until nc -z localhost 27017; do echo Waiting for MongoDB; sleep 1; done
+  - git clone --depth 1 https://github.com/mongodb-labs/drivers-evergreen-tools
+  - export DRIVERS_TOOLS="${PWD}/drivers-evergreen-tools"
+  - export MONGO_ORCHESTRATION_HOME="$DRIVERS_TOOLS/.evergreen/orchestration"
+  - export MONGODB_BINARIES="$DRIVERS_TOOLS/mongodb/bin"
+
+  # disable ipv6 since its not supported on travis
+  - "find ${MONGO_ORCHESTRATION_HOME} -name \"*.json\" -exec sed -i 's/\"ipv6\": true/\"ipv6\": false/g' {} \\;"
+  - "find ${MONGO_ORCHESTRATION_HOME} -name \"*.json\" -exec sed -i 's/,::1//g' {} \\;"
+  - "find ${MONGO_ORCHESTRATION_HOME} -name \"*.json\" -exec sed -i 's/::1,//g' {} \\;"
+
+  - "echo '{ \"releases\": { \"default\": \"'${MONGODB_BINARIES}'\" } }' > $MONGO_ORCHESTRATION_HOME/orchestration.config"
+  - bash ${DRIVERS_TOOLS}/.evergreen/run-orchestration.sh || tail -n +1 ${MONGO_ORCHESTRATION_HOME}/*.log
+  - "export MONGODB_URI=$(grep -oP '(?<=MONGODB_URI: \")[^\"]*' mo-expansion.yml)"
