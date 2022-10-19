@@ -30,6 +30,7 @@ MongoDOWN.prototype._open = function (options, callback) {
   var self = this;
 
   self.collection = options.collection || 'mongodown';
+  self.extraFields = options.extraFields
   
   var connect = function () {
     self._db = mongojs(self.location, [self.collection]);
@@ -69,7 +70,19 @@ MongoDOWN.prototype._get = function (key, options, callback) {
 };
 
 MongoDOWN.prototype._put = function (key, value, options, callback) {
-  this._db[this.collection].save({ _id: key, value: value }, callback);
+  put.bind(this)(key, value, options, callback)
+}
+
+function put(key, value, options, callback) {
+  var doc = { _id: key, value: value };
+  var self = this
+  this.extraFields &&
+    Object.keys(this.extraFields).forEach(function (k) {
+      if (typeof self.extraFields[k] === 'function') {
+        doc[k] = self.extraFields[k](key, value)
+      }
+    });
+  this._db[this.collection].save(doc, callback);
 };
 
 MongoDOWN.prototype._del = function (key, options, callback) {
@@ -100,11 +113,12 @@ MongoDOWN.prototype._batch = function (array, options, callback) {
     if (err) return callback(err);
     var batch = batches.shift();
     if (!batch) return callback();
+    var _put = put.bind(self);
     switch (batch[0].type) {
       case 'put':
         var next = afterAll(commit);
         for (var n = 0, l = batch.length; n < l; n++)
-          self._db[self.collection].save({ _id: batch[n].key, value: batch[n].value }, next());
+          _put(batch[n].key, batch[n].value, null, next());
         break;
       case 'del':
         var keys = batch.map(function (e) { return e.key; });

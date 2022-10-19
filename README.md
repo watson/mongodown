@@ -36,6 +36,15 @@ db.readStream()
   .on('close', function () { console.log('Show\'s over folks!') })
 ```
 
+Will add `timestamp` key to mongo document on `put`:
+```
+var db = levelup(mongodown('localhost/my-database'), {
+  extraFields: {
+    timestamp: function (k,v) { return Date.now() }
+  }
+})
+```
+
 ## Limitations
 
 MongoDOWN does not support iterator snapshots
